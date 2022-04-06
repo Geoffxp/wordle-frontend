@@ -1,0 +1,49 @@
+.letter-grid {
+    display: block;
+    margin: 24px auto;
+    width: fit-content;
+}
+.letter-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    width: 294px;
+    margin-bottom: 12px;
+}
+.letter {
+    outline: 2px solid black;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    font-family: monospace;
+    font-size: 20px;
+}
+.input {
+    margin-top: 24px;
+}
+.keyboard {
+    display: block;
+    margin: 24px auto;
+    width: fit-content;
+}
+.keyboard-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.key {
+    height: 35px;
+    width: 45px;
+    margin: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid grey;
+    border-radius: 7px;
+    text-transform: uppercase;
+    font-family: monospace;
+    font-size: 20px;
+}
