@@ -1,4 +1,5 @@
 import { getWord, getList } from "./api.js";
+import { copyText } from "./clipboard.js";
 import Modal from "./Modal.js";
 
 const modal = new Modal('.modal');
@@ -11,6 +12,7 @@ const game = async () => {
     if (localStorage.getItem('word') !== word) {
         localStorage.setItem('word', word);
         localStorage.setItem('guesses', '');
+        localStorage.setItem('clipboardCode', '');
         pastGuesses = '';
     }
     const pastGuessArray = pastGuesses.split(' ');
@@ -24,6 +26,8 @@ const game = async () => {
     let win = false;
 
     const keys = Array.from(document.querySelectorAll(".key"));
+
+    const clipboardCodes = []
 
     for (let guess of pastGuessArray) {
         if (guess.length) {
@@ -49,21 +53,20 @@ const game = async () => {
                             if (status === 0 && key.style.background !== 'var(--green)') key.style.background = 'grey';
                         }
                     })
-                    if (numberCorrect === 5) {
-                        modal.open("<div class='modal-card'><h2>Nice job</h2></div>");
-                        game = false;
-                        win = true;
-                    }
                 }, index * 200)
             })
             setTimeout(() => {
-                currentLine++;
-                if (currentLine > 5 && !win) {
+                if (numberCorrect === 5 && currentLine <= 6) {
+                    modal.open("<div class='modal-card'><h2>Nice job</h2><p>SHARE</p></div>");
                     game = false;
-                    modal.open(`<div class='modal-card'><h2>Bad job</h2><h2>word was '${word}' idiot</h2></div>`);
+                    win = true;
+                } else if (currentLine > 5 && !win) {
+                    game = false;
+                    modal.open(`<div class='modal-card'><h2>Bad job</h2><h2>word was '${word}' idiot</h2><p>SHARE</p></div>`);
                 }
                 currentGuess = [];
             }, 1200)
+            currentLine++;
         }
     }
     document.addEventListener('keydown', (e) => {
@@ -100,8 +103,11 @@ const game = async () => {
                                 if (status === 0 && key.style.background !== 'var(--green)') key.style.background = 'grey';
                             }
                         })
+                        clipboardCodes.push(status);
+                        localStorage.setItem('clipboardCode', clipboardCodes.join(' '))
+                        console.log(clipboardCodes)
                         if (numberCorrect === 5) {
-                            modal.open("<div class='modal-card'><h2>Nice job</h2></div>");
+                            modal.open("<div class='modal-card'><h2>Nice job</h2><p>SHARE</p></div>");
                             game = false;
                             win = true;
                         }
@@ -111,7 +117,7 @@ const game = async () => {
                     currentLine++;
                     if (currentLine > 5 && !win) {
                         game = false;
-                        modal.open(`<div class='modal-card'><h2>Bad job</h2><h2>word was '${word}' idiot</h2></div>`);
+                        modal.open(`<div class='modal-card'><h2>Bad job</h2><h2>word was '${word}' idiot</h2><p onclick=copyText()'>SHARE</p></div>`);
                     }
                     currentGuess = [];
                 }, 1200)
@@ -184,8 +190,11 @@ const game = async () => {
                                     if (status === 0 && key.style.background !== 'var(--green)') key.style.background = 'grey';
                                 }
                             })
+                            clipboardCodes.push(status);
+                            localStorage.setItem('clipboardCode', clipboardCodes.join(' '))
+                            console.log(clipboardCodes)
                             if (numberCorrect === 5) {
-                                modal.open("<div class='modal-card'><h2>Nice job</h2></div>");
+                                modal.open("<div class='modal-card'><h2>Nice job</h2><p>SHARE</p></div>");
                                 game = false;
                                 win = true;
                             }
@@ -195,7 +204,7 @@ const game = async () => {
                         currentLine++;
                         if (currentLine > 5 && !win) {
                             game = false;
-                            modal.open(`<div class='modal-card'><h2>Bad job</h2><h2>word was '${word}' idiot</h2></div>`);
+                            modal.open(`<div class='modal-card'><h2>Bad job</h2><h2>word was '${word}' idiot</h2><p>SHARE</p></div>`);
                         }
                         currentGuess = [];
                     }, 1200)
