@@ -11,9 +11,9 @@ const game = async () => {
     if (localStorage.getItem('word') !== word) {
         localStorage.setItem('word', word);
         localStorage.setItem('guesses', '');
+        pastGuesses = '';
     }
     const pastGuessArray = pastGuesses.split(' ');
-    console.log(pastGuessArray)
 
     const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV";
     const guessGrid = Array.from(document.querySelector(".letter-grid").children)
@@ -23,12 +23,10 @@ const game = async () => {
     let game = true;
     let win = false;
 
-    const input = document.querySelector(".input")
     const keys = Array.from(document.querySelectorAll(".key"));
 
     for (let guess of pastGuessArray) {
         if (guess.length) {
-            console.log(currentLine, game)
             let numberCorrect = 0;
             Array.from(guessGrid[currentLine].children).forEach((letter, index) => {
                 let status;
