@@ -1,6 +1,8 @@
 export async function getWord() {
-    return await fetch("https://six-hour-words.herokuapp.com/").then(res => res.json()).then(res => res.data);
+    const word = await fetch("https://six-hour-words.herokuapp.com/").then(res => res.json()).then(res => res.data);
+    return word;
 }
 export async function getList() {
-    return await fetch("https://six-hour-words.herokuapp.com/getList").then(res => res.json()).then(res => res.data);
+    const list = await fetch("https://six-hour-words.herokuapp.com/getList").then(res => res.json()).then(res => res.data);
+    return list;
 }

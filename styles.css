@@ -41,6 +41,7 @@ body {
     width: 294px;
     margin-bottom: 12px;
     perspective: 500px;
+    -webkit-perspective: 500px;
 }
 .letter {
     outline: 1px solid grey;
@@ -55,11 +56,26 @@ body {
     transform-style: preserve-3d;
     transform: rotate3d(0,1,0,360deg);
     backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     transition: all 1s;
 }
 .letter--filled {
-    transform: none
+    animation: rotateZ 1s forwards linear;
 }
+@keyframes rotateZ {
+    0% {
+        transform: rotate3d(0,1,0,360deg);
+    }
+    50% {
+        transform: rotate3d(0,1,0,180deg);
+    }
+    100% {
+        transform: rotate3d(0,1,0,0deg);
+    }
+}
+/* .letter--filled {
+    transform: none
+} */
 .input {
     margin-top: 24px;
 }
@@ -96,6 +112,7 @@ body {
     -ms-user-select: none;
     user-select: none;
     transition: all 0.5s;
+    touch-action: manipulation;
 }
 .touched {
     background: grey;
