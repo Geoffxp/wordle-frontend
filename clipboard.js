@@ -2,7 +2,8 @@ export function copyText() {
     let outputString = '';
     const clipboardCode = localStorage.getItem('clipboardCode');
     const clipArray = clipboardCode.split(' ');
-
+    const totalGuess = localStorage.getItem('guesses').split(' ').length - 1;
+    outputString += `Gordle # - ${totalGuess}/6\n`;
     clipArray.forEach((code, index) => {
         if (code == 0) {
             outputString += '\u2B1C'
