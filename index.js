@@ -152,36 +152,40 @@ keys.forEach(key => {
                 localStorage.setItem('guesses', pastGuesses)
                 let numberCorrect = 0;
                 Array.from(guessGrid[currentLine].children).forEach((letter, index) => {
-                    let status;
-                    if (word[index] === currentGuess[index].toLowerCase()) { status = 2; }
-                    else if (word.includes(currentGuess[index].toLowerCase())) { status = 1; }
-                    else { status = 0 }
-                        letter.innerHTML = currentGuess[index];
-                    if (status === 2) {
-                        letter.style.background = 'green';
-                        numberCorrect++;
-                    };
-                    if (status === 1) letter.style.background = 'yellow';
-                    if (status === 0) letter.style.background = 'grey';
-                    keys.forEach(key => {
-                        if (key.innerHTML === currentGuess[index].toLowerCase()) {
-                            if (status === 2) key.style.background = 'green';
-                            if (status === 1 && key.style.background !== 'green') key.style.background = 'yellow';
-                            if (status === 0 && key.style.background !== 'green') key.style.background = 'grey';
-                        }
-                    })
-                    if (numberCorrect === 5) setTimeout(() => {
-                        modal.open("<div class='modal-card'><h2>Nice job</h2></div>");
-                        game = false;
-                    })
+                    setTimeout(() => {
+                        let status;
+                        if (word[index] === currentGuess[index].toLowerCase()) { status = 2; }
+                        else if (word.includes(currentGuess[index].toLowerCase())) { status = 1; }
+                        else { status = 0 }
+                            letter.innerHTML = currentGuess[index];
+                            letter.classList.add('letter--filled');
+                        if (status === 2) {
+                            letter.style.background = 'var(--green)';
+                            numberCorrect++;
+                        };
+                        if (status === 1) letter.style.background = 'var(--yellow)';
+                        if (status === 0) letter.style.background = 'grey';
+                        keys.forEach(key => {
+                            if (key.innerHTML === currentGuess[index].toLowerCase()) {
+                                if (status === 2) key.style.background = 'var(--green)';
+                                if (status === 1 && key.style.background !== 'var(--green)') key.style.background = 'var(--yellow)';
+                                if (status === 0 && key.style.background !== 'var(--green)') key.style.background = 'grey';
+                            }
+                        })
+                        if (numberCorrect === 5) setTimeout(() => {
+                            modal.open("<div class='modal-card'><h2>Nice job</h2></div>");
+                            game = false;
+                        })
+                    }, index * 200)
                 })
-    
-                currentLine++;
-                if (currentLine > 5) {
-                    game = false;
-                    modal.open(`<div class='modal-card'><h2>Bad job</h2><h2>word was '${word}' idiot</h2></div>`);
-                }
-                currentGuess = [];
+                setTimeout(() => {
+                    currentLine++;
+                    if (currentLine > 5) {
+                        game = false;
+                        modal.open(`<div class='modal-card'><h2>Bad job</h2><h2>word was '${word}' idiot</h2></div>`);
+                    }
+                    currentGuess = [];
+                }, 1200)
             }
         }
         if (char === 'Backspace') {
