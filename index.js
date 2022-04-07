@@ -1,5 +1,5 @@
 import { getWord, getList } from "./api.js";
-import Modal from "./modal.js";
+import Modal from "./Modal.js";
 
 const modal = new Modal('.modal')
 
