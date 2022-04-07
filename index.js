@@ -21,6 +21,7 @@ const guessGrid = Array.from(document.querySelector(".letter-grid").children)
 let currentLine = 0;
 let currentGuess = [];
 let game = true;
+let win = false;
 
 const input = document.querySelector(".input")
 const keys = Array.from(document.querySelectorAll(".key"));
@@ -50,19 +51,21 @@ for (let guess of pastGuessArray) {
                         if (status === 0 && key.style.background !== 'var(--green)') key.style.background = 'grey';
                     }
                 })
-                if (numberCorrect === 5) setTimeout(() => {
+                if (numberCorrect === 5) {
                     modal.open("<div class='modal-card'><h2>Nice job</h2></div>");
                     game = false;
-                })
+                    win = true;
+                }
             }, index * 200)
         })
-
-        currentLine++;
-        if (currentLine > 5) {
-            game = false;
-            modal.open(`<div class='modal-card'><h2>Bad job</h2><h2>word was '${word}' idiot</h2></div>`);
-        }
-        currentGuess = [];
+        setTimeout(() => {
+            currentLine++;
+            if (currentLine > 5 && !win) {
+                game = false;
+                modal.open(`<div class='modal-card'><h2>Bad job</h2><h2>word was '${word}' idiot</h2></div>`);
+            }
+            currentGuess = [];
+        }, 1200)
     }
 }
 document.addEventListener('keydown', (e) => {
@@ -99,15 +102,16 @@ document.addEventListener('keydown', (e) => {
                             if (status === 0 && key.style.background !== 'var(--green)') key.style.background = 'grey';
                         }
                     })
-                    if (numberCorrect === 5) setTimeout(() => {
+                    if (numberCorrect === 5) {
                         modal.open("<div class='modal-card'><h2>Nice job</h2></div>");
                         game = false;
-                    })
+                        win = true;
+                    }
                 }, index * 200)
             })
             setTimeout(() => {
                 currentLine++;
-                if (currentLine > 5) {
+                if (currentLine > 5 && !win) {
                     game = false;
                     modal.open(`<div class='modal-card'><h2>Bad job</h2><h2>word was '${word}' idiot</h2></div>`);
                 }
@@ -178,15 +182,16 @@ keys.forEach(key => {
                                 if (status === 0 && key.style.background !== 'var(--green)') key.style.background = 'grey';
                             }
                         })
-                        if (numberCorrect === 5) setTimeout(() => {
+                        if (numberCorrect === 5) {
                             modal.open("<div class='modal-card'><h2>Nice job</h2></div>");
                             game = false;
-                        })
+                            win = true;
+                        }
                     }, index * 200)
                 })
                 setTimeout(() => {
                     currentLine++;
-                    if (currentLine > 5) {
+                    if (currentLine > 5 && !win) {
                         game = false;
                         modal.open(`<div class='modal-card'><h2>Bad job</h2><h2>word was '${word}' idiot</h2></div>`);
                     }
