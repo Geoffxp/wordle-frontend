@@ -139,7 +139,13 @@ document.addEventListener('keydown', (e) => {
     }
 })
 keys.forEach(key => {
+    key.addEventListener('touchend', () => {
+        key.classList.remove('touched');
+    })
+})
+keys.forEach(key => {
     key.addEventListener('touchstart', () => {
+        key.classList.add('touched');
         if (game) {
         const char = key.innerHTML;
         if (char === 'Enter' && currentGuess.length === 5 && game === true) {

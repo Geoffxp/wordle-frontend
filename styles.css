@@ -78,8 +78,8 @@ body {
     width: 100%;
 }
 .key {
-    height: 40px;
-    width: 25px;
+    height: 45px;
+    width: 30px;
     margin: 2px;
     display: flex;
     align-items: center;
@@ -95,6 +95,11 @@ body {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    transition: all 0.5s;
+}
+.touched {
+    background: grey;
+    transition: none;
 }
 .enter {
     width: 50px;
