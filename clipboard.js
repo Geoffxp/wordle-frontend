@@ -3,7 +3,10 @@ export function copyText() {
     const clipboardCode = localStorage.getItem('clipboardCode');
     const clipArray = clipboardCode.split(' ');
     const totalGuess = localStorage.getItem('guesses').split(' ').length - 1;
-    outputString += `Gordle # - ${totalGuess}/6\n`;
+    const gordNum = localStorage.getItem('currentWord');
+    const clipPop = document.querySelector(".clip-pop");
+
+    outputString += `Gordle #${gordNum} - ${totalGuess}/6\n`;
     clipArray.forEach((code, index) => {
         if (code == 0) {
             outputString += '\u2B1C'
@@ -16,4 +19,8 @@ export function copyText() {
     })
   
     navigator.clipboard.writeText(outputString);
+    clipPop.classList.add("popped");
+    setTimeout(() => {
+        clipPop.classList.remove("popped");
+    }, 2000)
 }

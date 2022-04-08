@@ -1,11 +1,29 @@
-import { getWord, getList } from "./api.js";
+import { getWord, getList, getGordle } from "./api.js";
 import { copyText } from "./clipboard.js";
 import Modal from "./Modal.js";
 
 const modal = new Modal('.modal');
 const game = async () => {
-    const word = await getWord();
-    const words = await getList();
+    const countdown = document.querySelector(".hours");
+    const gordNumber = document.querySelector(".gordNumber");
+    const gordle = await getGordle();
+    const word = gordle.word;
+    const words = gordle.list;
+    const newTime = new Date().setTime(Date.now() + ((6 - gordle.timeToUpdate) * 60 * 60 * 1000));
+    const currentTime = new Date();
+    let secondsTill = (newTime - currentTime) / 1000;
+    setInterval(() => {
+        secondsTill--;
+        const seconds = Math.floor(secondsTill % 60).toString().length > 1 ? Math.floor(secondsTill % 60) : '0' + Math.floor(secondsTill % 60).toString()
+        const minutes = Math.floor(secondsTill / 60).toString().length > 1 ? Math.floor(secondsTill / 60) : '0' + Math.floor(secondsTill / 60).toString()
+        countdown.innerText = `${Math.floor(secondsTill / 3600)}:${minutes}:${seconds}`;
+    }, 1000)
+    localStorage.setItem('currentWord', gordle.current);
+    gordNumber.innerText = gordle.current;
+    localStorage.setItem('tto', gordle.timeToUpdate);
+    localStorage.setItem('lastTime', gordle.lastTime);
+    // const word = await getWord();
+    // const words = await getList();
 
     let pastGuesses = localStorage.getItem('guesses') ? localStorage.getItem('guesses') : '';
     if (!localStorage.getItem('word')) localStorage.setItem('word', word);
