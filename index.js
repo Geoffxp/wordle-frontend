@@ -15,7 +15,7 @@ const game = async () => {
     setInterval(() => {
         secondsTill--;
         const seconds = Math.floor(secondsTill % 60).toString().length > 1 ? Math.floor(secondsTill % 60) : '0' + Math.floor(secondsTill % 60).toString()
-        const minutes = Math.floor(secondsTill / 60).toString().length > 1 ? Math.floor(secondsTill / 60) : '0' + Math.floor(secondsTill / 60).toString()
+        const minutes = Math.floor((secondsTill / 60) % 60).toString().length > 1 ? Math.floor((secondsTill / 60) % 60) : '0' + Math.floor((secondsTill / 60) % 60).toString()
         countdown.innerText = `${Math.floor(secondsTill / 3600)}:${minutes}:${seconds}`;
     }, 1000)
     localStorage.setItem('currentWord', gordle.current);
