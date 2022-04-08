@@ -81,7 +81,10 @@ const game = async () => {
                             const removeIndex = currentCheck[currentLetter].indexOf(index);
                             currentCheck[currentLetter].splice(removeIndex, 1)
                         }
-                        else if (currentCheck[currentLetter].length) { status = 1; }
+                        else if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
+                            status = 1; 
+                            currentCheck[currentLetter].push('yellowed')
+                        }
                         else { status = 0 }
                     } else { status = 0}
                         letter.innerHTML = guess[index];
@@ -146,7 +149,10 @@ const game = async () => {
                                 const removeIndex = currentCheck[currentLetter].indexOf(index);
                                 currentCheck[currentLetter].splice(removeIndex, 1)
                             }
-                            else if (currentCheck[currentLetter].length) { status = 1; }
+                            else if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
+                                status = 1; 
+                                currentCheck[currentLetter].push('yellowed')
+                            }
                             else { status = 0 }
                         } else { status = 0}
                             letter.innerHTML = currentGuess[index];
@@ -247,7 +253,10 @@ const game = async () => {
                                     const removeIndex = currentCheck[currentLetter].indexOf(index);
                                     currentCheck[currentLetter].splice(removeIndex, 1)
                                 }
-                                else if (currentCheck[currentLetter].length) { status = 1; }
+                                else if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
+                                    status = 1; 
+                                    currentCheck[currentLetter].push('yellowed')
+                                }
                                 else { status = 0 }
                             } else { status = 0}
                                 letter.innerHTML = currentGuess[index];
