@@ -1,5 +1,4 @@
 import { getWord, getList, getGordle } from "./api.js";
-import { copyText } from "./clipboard.js";
 import Modal from "./Modal.js";
 
 const modal = new Modal('.modal');
@@ -40,22 +39,49 @@ const game = async () => {
 
     let currentLine = 0;
     let currentGuess = [];
-    let game = true;
+    let activeGame = true;
     let win = false;
 
     const keys = Array.from(document.querySelectorAll(".key"));
 
-    const clipboardCodes = []
+    const clipboardCodes = [];
+
+    const defaultCheck = {};
+
+    for (let i = 0; i < word.length; i++) {
+        if (defaultCheck[word[i]]) {
+            defaultCheck[word[i]].push(i);
+        } else {
+            defaultCheck[word[i]] = [i];
+        }
+    }
 
     for (let guess of pastGuessArray) {
         if (guess.length) {
             let numberCorrect = 0;
+            const currentCheck = {};
+
+            for (let i = 0; i < word.length; i++) {
+                if (currentCheck[word[i]]) {
+                    currentCheck[word[i]].push(i);
+                } else {
+                    currentCheck[word[i]] = [i];
+                }
+            }
+
             Array.from(guessGrid[currentLine].children).forEach((letter, index) => {
                 let status;
+                const currentLetter = guess[index].toLowerCase();
                 setTimeout(() => {
-                    if (word[index] === guess[index].toLowerCase()) { status = 2; }
-                    else if (word.includes(guess[index].toLowerCase())) { status = 1; }
-                    else { status = 0 }
+                    if (currentCheck[currentLetter]) {
+                        if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(index)) { 
+                            status = 2; 
+                            const removeIndex = currentCheck[currentLetter].indexOf(index);
+                            currentCheck[currentLetter].splice(removeIndex, 1)
+                        }
+                        else if (currentCheck[currentLetter].length) { status = 1; }
+                        else { status = 0 }
+                    } else { status = 0}
                         letter.innerHTML = guess[index];
                         letter.classList.add('letter--filled')
                     if (status === 2) {
@@ -76,10 +102,10 @@ const game = async () => {
             setTimeout(() => {
                 if (numberCorrect === 5 && currentLine <= 6) {
                     modal.open("<div class='modal-card'><h2>Nice job</h2><p>SHARE</p></div>");
-                    game = false;
+                    activeGame = false;
                     win = true;
                 } else if (currentLine > 5 && !win) {
-                    game = false;
+                    activeGame = false;
                     modal.open(`<div class='modal-card'><h2>Bad job</h2><h2>word was '${word}' idiot</h2><p>SHARE</p></div>`);
                 }
                 currentGuess = [];
@@ -88,10 +114,9 @@ const game = async () => {
         }
     }
     document.addEventListener('keydown', (e) => {
-        console.log("press")
-        if (game) {
+        if (activeGame) {
         const char = e.key;
-        if (char === 'Enter' && currentGuess.length === 5 && game === true) {
+        if (char === 'Enter' && currentGuess.length === 5 && activeGame === true) {
             const guess = currentGuess.join('');
             if (!words.includes(guess)) {
                 alert('not a word')
@@ -100,12 +125,28 @@ const game = async () => {
                 pastGuesses += ' ';
                 localStorage.setItem('guesses', pastGuesses)
                 let numberCorrect = 0;
+                const currentCheck = {};
+
+                for (let i = 0; i < word.length; i++) {
+                    if (currentCheck[word[i]]) {
+                        currentCheck[word[i]].push(i);
+                    } else {
+                        currentCheck[word[i]] = [i];
+                    }
+                }
                 Array.from(guessGrid[currentLine].children).forEach((letter, index) => {
                     setTimeout(() => {
                         let status;
-                        if (word[index] === currentGuess[index].toLowerCase()) { status = 2; }
-                        else if (word.includes(currentGuess[index].toLowerCase())) { status = 1; }
-                        else { status = 0 }
+                        const currentLetter = guess[index].toLowerCase();
+                        if (currentCheck[currentLetter]) {
+                            if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(index)) { 
+                                status = 2; 
+                                const removeIndex = currentCheck[currentLetter].indexOf(index);
+                                currentCheck[currentLetter].splice(removeIndex, 1)
+                            }
+                            else if (currentCheck[currentLetter].length) { status = 1; }
+                            else { status = 0 }
+                        } else { status = 0}
                             letter.innerHTML = currentGuess[index];
                             letter.classList.add('letter--filled');
                         if (status === 2) {
@@ -123,10 +164,9 @@ const game = async () => {
                         })
                         clipboardCodes.push(status);
                         localStorage.setItem('clipboardCode', clipboardCodes.join(' '))
-                        console.log(clipboardCodes)
                         if (numberCorrect === 5) {
                             modal.open("<div class='modal-card'><h2>Nice job</h2><p>SHARE</p></div>");
-                            game = false;
+                            activeGame = false;
                             win = true;
                         }
                     }, index * 200)
@@ -134,7 +174,7 @@ const game = async () => {
                 setTimeout(() => {
                     currentLine++;
                     if (currentLine > 5 && !win) {
-                        game = false;
+                        activeGame = false;
                         modal.open(`<div class='modal-card'><h2>Bad job</h2><h2>word was '${word}' idiot</h2><p onclick=copyText()'>SHARE</p></div>`);
                     }
                     currentGuess = [];
@@ -155,9 +195,8 @@ const game = async () => {
         })
         } else {
             currentGuess.push(e.key);
-            console.log(currentGuess)
             if (currentGuess.join('') === 'reset') {
-                game = true;
+                activeGame = true;
                 localStorage.clear();
                 currentGuess = [];
                 currentLine = 0;
@@ -176,9 +215,9 @@ const game = async () => {
     })
     keys.forEach(key => {
         key.addEventListener('click', () => {
-            if (game) {
+            if (activeGame) {
             const char = key.innerHTML;
-            if (char === 'Enter' && currentGuess.length === 5 && game === true) {
+            if (char === 'Enter' && currentGuess.length === 5 && activeGame === true) {
                 const guess = currentGuess.join('');
                 if (!words.includes(guess)) {
                     alert('not a word')
@@ -187,12 +226,28 @@ const game = async () => {
                     pastGuesses += ' ';
                     localStorage.setItem('guesses', pastGuesses)
                     let numberCorrect = 0;
+                    const currentCheck = {};
+
+                    for (let i = 0; i < word.length; i++) {
+                        if (currentCheck[word[i]]) {
+                            currentCheck[word[i]].push(i);
+                        } else {
+                            currentCheck[word[i]] = [i];
+                        }
+                    }
                     Array.from(guessGrid[currentLine].children).forEach((letter, index) => {
                         setTimeout(() => {
                             let status;
-                            if (word[index] === currentGuess[index].toLowerCase()) { status = 2; }
-                            else if (word.includes(currentGuess[index].toLowerCase())) { status = 1; }
-                            else { status = 0 }
+                            const currentLetter = guess[index].toLowerCase();
+                            if (currentCheck[currentLetter]) {
+                                if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(index)) { 
+                                    status = 2; 
+                                    const removeIndex = currentCheck[currentLetter].indexOf(index);
+                                    currentCheck[currentLetter].splice(removeIndex, 1)
+                                }
+                                else if (currentCheck[currentLetter].length) { status = 1; }
+                                else { status = 0 }
+                            } else { status = 0}
                                 letter.innerHTML = currentGuess[index];
                                 letter.classList.add('letter--filled');
                             if (status === 2) {
@@ -210,10 +265,9 @@ const game = async () => {
                             })
                             clipboardCodes.push(status);
                             localStorage.setItem('clipboardCode', clipboardCodes.join(' '))
-                            console.log(clipboardCodes)
                             if (numberCorrect === 5) {
                                 modal.open("<div class='modal-card'><h2>Nice job</h2><p>SHARE</p></div>");
-                                game = false;
+                                activeGame = false;
                                 win = true;
                             }
                         }, index * 200)
@@ -221,7 +275,7 @@ const game = async () => {
                     setTimeout(() => {
                         currentLine++;
                         if (currentLine > 5 && !win) {
-                            game = false;
+                            activeGame = false;
                             modal.open(`<div class='modal-card'><h2>Bad job</h2><h2>word was '${word}' idiot</h2><p>SHARE</p></div>`);
                         }
                         currentGuess = [];
@@ -242,9 +296,8 @@ const game = async () => {
             })
             } else {
                 currentGuess.push(key.innerHTML);
-                console.log(currentGuess)
                 if (currentGuess.join('') === 'reset') {
-                    game = true;
+                    activeGame = true;
                     localStorage.clear();
                     currentGuess = [];
                     currentLine = 0;
