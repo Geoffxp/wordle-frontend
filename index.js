@@ -30,6 +30,8 @@ const game = async () => {
         localStorage.setItem('word', word);
         localStorage.setItem('guesses', '');
         localStorage.setItem('clipboardCode', '');
+        localStorage.setItem('tto', gordle.timeToUpdate);
+        localStorage.setItem('lastTime', gordle.lastTime);
         pastGuesses = '';
     }
     const pastGuessArray = pastGuesses.split(' ');
