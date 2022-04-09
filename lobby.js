@@ -5,8 +5,8 @@ const chat = async () => {
     const feed = document.querySelector(".feed");
 
     feed.scrollTo(0, feed.scrollHeight);
-    
-    const join = await fetch("http://localhost:5000/chat", {
+
+    const join = await fetch("https://six-hour-words.herokuapp.com/chat", {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
@@ -22,7 +22,7 @@ const chat = async () => {
         feed.appendChild(newMessage)
     })
     const keepAlive = setInterval(() => {
-        return fetch("http://localhost:5000/chat").then(res => res.json()).then(res => {
+        return fetch("https://six-hour-words.herokuapp.com/chat").then(res => res.json()).then(res => {
             res.messages.forEach(message => {
                 if (!messages.includes(message)) {
                     const newMessage = document.createElement('p');
@@ -34,7 +34,7 @@ const chat = async () => {
         })
     }, 1000)
     const post = async (message) => {
-        return fetch("http://localhost:5000/chat", {
+        return fetch("https://six-hour-words.herokuapp.com/chat", {
             method: "PUT",
             headers: {
                 'Content-Type': 'application/json'
@@ -68,7 +68,7 @@ chat();
 
 // const lobby = async () => {
 //     let close = false
-//     const createLobby = await fetch("http://localhost:5000/battle")
+//     const createLobby = await fetch("https://six-hour-words.herokuapp.com/battle")
 //     .then(res => res.json())
 //     .then(res =>res.data)
     
@@ -78,7 +78,7 @@ chat();
 //         console.log('keep alive')
 //         const liveLobby = setInterval(() => {
 //             if (close) clearInterval(liveLobby)
-//             fetch('http://localhost:5000/battle', {
+//             fetch('https://six-hour-words.herokuapp.com/battle', {
 //                 method:"POST",
 //                 headers: {
 //                     'Content-Type':'application/json'
@@ -90,7 +90,7 @@ chat();
 //         }, 5000)
 //         const getMessages = setInterval(() => {
 //             if (close) clearInterval(liveLobby)
-//             fetch('http://localhost:5000/battle', {
+//             fetch('https://six-hour-words.herokuapp.com/battle', {
 //                 method:"POST",
 //                 headers: {
 //                     'Content-Type':'application/json'
@@ -105,7 +105,7 @@ chat();
 //         const textarea = document.querySelector(".message");
 //         const feed = document.querySelector(".feed");
 //         const text = textarea.value;
-//         fetch('http://localhost:5000/battle', {
+//         fetch('https://six-hour-words.herokuapp.com/battle', {
 //             method:"POST",
 //             headers: {
 //                 'Content-Type':'application/json'
