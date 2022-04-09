@@ -1,4 +1,4 @@
-import { getWord, getList, getGordle } from "./api.js";
+import {  getGordle, updateGame } from "./api.js";
 import Modal from "./Modal.js";
 
 const modal = new Modal('.modal');

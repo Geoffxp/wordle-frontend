@@ -200,3 +200,30 @@ body {
     opacity: 1;
     margin:0;
 }
+.feed {
+    width: 90%;
+    margin: 0 auto;
+    background: white;
+    color: black;
+    height: 500px;
+    max-width: 900px;
+}
+.message {
+    width: 90%;
+    margin: 0 auto;
+    display: block;
+    background: white;
+    color: black;
+    height: 100px;
+    max-width: 900px;
+}
+.send {
+    background: transparent;
+    border: 1px solid white;
+    margin: 0 auto;
+    display: block;
+    padding: 12px;
+}
+.feed p {
+    color: black;
+}
