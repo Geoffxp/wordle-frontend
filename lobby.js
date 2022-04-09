@@ -1,4 +1,4 @@
-const chat = async () => {
+const chat = async (username) => {
     const messages = [];
     const sendBtn = document.querySelector(".send");
     const textarea = document.querySelector(".message");
@@ -12,7 +12,7 @@ const chat = async () => {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            user: 'Goff'
+            user: username
         })
     }).then(res => res.json());
     join.messages.forEach(message => {
@@ -40,7 +40,7 @@ const chat = async () => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                message: message
+                message: `${username}: ${message}`
             })
         }).then(res => res.json()).then(res => {
             res.messages.forEach(message => {
@@ -64,7 +64,13 @@ const chat = async () => {
         }
     })
 }
-chat(); 
+const userForm = document.querySelector(".username");
+userForm.addEventListener("submit", (e) => {
+    e.preventDefault()
+    userForm.style.display = 'none';
+    chat(userForm.children[0].value);
+})
+
 
 // const lobby = async () => {
 //     let close = false

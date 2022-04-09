@@ -227,3 +227,22 @@ body {
 .feed p {
     color: black;
 }
+.username {
+    width: 90%;
+    max-width: 400px;
+    margin: 24px auto;
+}
+.username input {
+    width: 100%;
+    height: 40px;
+    color: black;
+}
+.username button {
+    display: flex;
+    width: 100%;
+    background: transparent;
+    border: 1px solid white;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
