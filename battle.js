@@ -35,7 +35,7 @@ const game = async () => {
                 clearInterval(matchmaker);
             }
         })
-    }, 5000)
+    }, 1000)
     const updater = setInterval(() => {
         if (gameData.isRunning) {
             if (!clockRunning) {
