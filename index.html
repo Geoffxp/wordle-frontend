@@ -9,7 +9,30 @@
         <div class="modal"></div>
         <div class="clip-pop">COPIED TO CLIPBOARD</div>
         <nav class="gordle">
-            <h1 style="padding-left: 24px;">
+            <div class="hamburger">&nbsp;</div>
+            <ul>
+                <li class="login">
+                    <form id="userForm">
+                        <label for="username">Username</label>
+                        <input id="username" type="type" />
+                        <label for="username">Password (coming soon)</label>
+                        <input id="password" type="password" />
+                        <div class="btnBay">
+                            <button id="signupBtn" type="button">SIGNUP</button>
+                            <button id="loginBtn" type="button">LOGIN</button>
+                        </div>
+                    </form>
+                </li>
+                <li class="account">
+                    <a href="/account">
+                        ACCOUNT
+                    </a>
+                </li>
+                <li class="logout">
+                    LOGOUT
+                </li>
+            </ul>
+            <h1>
                 Gordle #<span class="gordNumber"></span><br>New Gord: <span class="hours"></span>
             </h1>
             <a style="margin-left:auto;display:block;filter:invert(1);padding-right:24px;"
@@ -164,5 +187,6 @@
             </div>
         </div>
         <script src="/index.js" type="module"></script>
+        <script src="/menu.js" type="module"></script>
     </body>
 </html>

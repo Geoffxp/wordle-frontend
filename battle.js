@@ -11,7 +11,9 @@ const game = async () => {
 
 
     // backend game creation / joining
-    let gameData = await getGameData();
+    const playerName = sessionStorage.getItem('username');
+    const opponentNameDock = document.querySelector(".opponentName");
+    let gameData = await getGameData(playerName);
     document.querySelector('.hours').innerText = 'searching...'
     const opponentGrid = document.querySelector(".opponent").children[0]
     const word = gameData.word;
@@ -28,6 +30,10 @@ const game = async () => {
                     token: token,
                     isRunning: true
                 });
+                const enemy = gameData.players[opponentIndex].playerName == 1 ||
+                            gameData.players[opponentIndex].playerName == 2 ? `Player ${gameData.players[opponentIndex].playerName}` :
+                            gameData.players[opponentIndex].playerName
+                opponentNameDock.innerText = enemy
                 clearInterval(matchmaker);
             }
             if (isReady == 'timeout') {
@@ -52,7 +58,7 @@ const game = async () => {
             updateGame(gameData, playerIndex).then(res => res.json()).then(res => {
                 gameData = res;
                 if (gameData.winner) {
-                    if (gameData.winner.playerName == playerIndex + 1) {
+                    if (gameData.winner.playerName == playerName) {
                         alert('you won')
                     } else {
                         alert(`your lost, the word was: ${word}`)
