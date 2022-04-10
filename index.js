@@ -211,7 +211,7 @@ const game = async () => {
                                 if (statusArray[index] === 0 && key.style.background !== 'var(--green)' && key.style.background !== 'var(--yellow)') key.style.background = 'grey';
                             }
                         })
-                        clipboardCodes.push(status);
+                        clipboardCodes.push(statusArray[index]);
                         localStorage.setItem('clipboardCode', clipboardCodes.join(' '))
                         if (numberCorrect === 5) {
                             modal.open("<div class='modal-card'><h2>Nice job</h2><p>SHARE</p></div>");
