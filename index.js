@@ -1,7 +1,8 @@
-import {  getGordle, updateGame } from "./api.js";
+import {  getGordle } from "./api.js";
 import Modal from "./Modal.js";
 
 const modal = new Modal('.modal');
+
 const game = async () => {
     const countdown = document.querySelector(".hours");
     const gordNumber = document.querySelector(".gordNumber");
@@ -62,6 +63,7 @@ const game = async () => {
         if (guess.length) {
             let numberCorrect = 0;
             const currentCheck = {};
+            let statusArray = [0,0,0,0,0];
 
             for (let i = 0; i < word.length; i++) {
                 if (currentCheck[word[i]]) {
@@ -70,36 +72,54 @@ const game = async () => {
                     currentCheck[word[i]] = [i];
                 }
             }
-
+            for (let i = 0; i < guess.length; i++) {
+                const currentLetter = guess[i].toLowerCase();
+                if (currentCheck[currentLetter]) {
+                    if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(i)) { 
+                        statusArray[i] = 2; 
+                        const removeIndex = currentCheck[currentLetter].indexOf(i);
+                        currentCheck[currentLetter].splice(removeIndex, 1)
+                    } else { statusArray[i] = 0; }
+                } else { statusArray[i] = 0; }
+            }
+            for (let i = 0; i < guess.length; i++) {
+                const currentLetter = guess[i].toLowerCase();
+                if (currentCheck[currentLetter]) {
+                    if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
+                        statusArray[i] = 1; 
+                        currentCheck[currentLetter].push('yellowed')
+                    } 
+                } 
+            }
             Array.from(guessGrid[currentLine].children).forEach((letter, index) => {
-                let status;
-                const currentLetter = guess[index].toLowerCase();
+                // let status;
+                // const currentLetter = guess[index].toLowerCase();
                 setTimeout(() => {
-                    if (currentCheck[currentLetter]) {
-                        if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(index)) { 
-                            status = 2; 
-                            const removeIndex = currentCheck[currentLetter].indexOf(index);
-                            currentCheck[currentLetter].splice(removeIndex, 1)
-                        }
-                        else if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
-                            status = 1; 
-                            currentCheck[currentLetter].push('yellowed')
-                        }
-                        else { status = 0 }
-                    } else { status = 0}
-                        letter.innerHTML = guess[index];
-                        letter.classList.add('letter--filled')
-                    if (status === 2) {
+                    // if (currentCheck[currentLetter]) {
+                    //     if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(index)) { 
+                    //         status = 2; 
+                    //         const removeIndex = currentCheck[currentLetter].indexOf(index);
+                    //         currentCheck[currentLetter].splice(removeIndex, 1)
+                    //     }
+                    //     else if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
+                    //         status = 1; 
+                    //         currentCheck[currentLetter].push('yellowed')
+                    //     }
+                    //     else { status = 0 }
+                    // } else { status = 0}
+                    letter.innerHTML = guess[index];
+                    letter.classList.add('letter--filled')
+                    if (statusArray[index] === 2) {
                         letter.style.background = 'var(--green)';
                         numberCorrect++;
                     };
-                    if (status === 1) letter.style.background = 'var(--yellow)';
-                    if (status === 0) letter.style.background = 'grey';
+                    if (statusArray[index] === 1) letter.style.background = 'var(--yellow)';
+                    if (statusArray[index] === 0) letter.style.background = 'grey';
                     keys.forEach(key => {
                         if (key.innerHTML === guess[index].toLowerCase()) {
-                            if (status === 2) key.style.background = 'var(--green)';
-                            if (status === 1 && key.style.background !== 'var(--green)') key.style.background = 'var(--yellow';
-                            if (status === 0 && key.style.background !== 'var(--green)') key.style.background = 'grey';
+                            if (statusArray[index] === 2) key.style.background = 'var(--green)';
+                            if (statusArray[index] === 1 && key.style.background !== 'var(--green)') key.style.background = 'var(--yellow';
+                            if (statusArray[index] === 0 && key.style.background !== 'var(--green)' && key.style.background !== 'var(--yellow)') key.style.background = 'grey';
                         }
                     })
                 }, index * 200)
@@ -114,6 +134,7 @@ const game = async () => {
                     modal.open(`<div class='modal-card'><h2>Bad job</h2><h2>word was '${word}' idiot</h2><p>SHARE</p></div>`);
                 }
                 currentGuess = [];
+                statusArray = [0,0,0,0,0];
             }, 1200)
             currentLine++;
         }
@@ -131,6 +152,7 @@ const game = async () => {
                 localStorage.setItem('guesses', pastGuesses)
                 let numberCorrect = 0;
                 const currentCheck = {};
+                let statusArray = [0,0,0,0,0];
 
                 for (let i = 0; i < word.length; i++) {
                     if (currentCheck[word[i]]) {
@@ -139,35 +161,54 @@ const game = async () => {
                         currentCheck[word[i]] = [i];
                     }
                 }
+                for (let i = 0; i < guess.length; i++) {
+                    const currentLetter = guess[i].toLowerCase();
+                    if (currentCheck[currentLetter]) {
+                        if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(i)) { 
+                            statusArray[i] = 2; 
+                            const removeIndex = currentCheck[currentLetter].indexOf(i);
+                            currentCheck[currentLetter].splice(removeIndex, 1)
+                        } else { statusArray[i] = 0; }
+                    } else { statusArray[i] = 0; }
+                }
+                for (let i = 0; i < guess.length; i++) {
+                    const currentLetter = guess[i].toLowerCase();
+                    if (currentCheck[currentLetter]) {
+                        if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
+                            statusArray[i] = 1; 
+                            currentCheck[currentLetter].push('yellowed')
+                        } 
+                    } 
+                }
                 Array.from(guessGrid[currentLine].children).forEach((letter, index) => {
                     setTimeout(() => {
-                        let status;
-                        const currentLetter = guess[index].toLowerCase();
-                        if (currentCheck[currentLetter]) {
-                            if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(index)) { 
-                                status = 2; 
-                                const removeIndex = currentCheck[currentLetter].indexOf(index);
-                                currentCheck[currentLetter].splice(removeIndex, 1)
-                            }
-                            else if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
-                                status = 1; 
-                                currentCheck[currentLetter].push('yellowed')
-                            }
-                            else { status = 0 }
-                        } else { status = 0}
-                            letter.innerHTML = currentGuess[index];
-                            letter.classList.add('letter--filled');
-                        if (status === 2) {
+                        // let status;
+                        // const currentLetter = guess[index].toLowerCase();
+                        // if (currentCheck[currentLetter]) {
+                        //     if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(index)) { 
+                        //         status = 2; 
+                        //         const removeIndex = currentCheck[currentLetter].indexOf(index);
+                        //         currentCheck[currentLetter].splice(removeIndex, 1)
+                        //     }
+                        //     else if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
+                        //         status = 1; 
+                        //         currentCheck[currentLetter].push('yellowed')
+                        //     }
+                        //     else { status = 0 }
+                        // } else { status = 0}
+                        letter.innerHTML = currentGuess[index];
+                        letter.classList.add('letter--filled');
+                        if (statusArray[index] === 2) {
                             letter.style.background = 'var(--green)';
                             numberCorrect++;
                         };
-                        if (status === 1) letter.style.background = 'var(--yellow)';
-                        if (status === 0) letter.style.background = 'grey';
+                        if (statusArray[index] === 1) letter.style.background = 'var(--yellow)';
+                        if (statusArray[index] === 0) letter.style.background = 'grey';
                         keys.forEach(key => {
                             if (key.innerHTML === currentGuess[index].toLowerCase()) {
-                                if (status === 2) key.style.background = 'var(--green)';
-                                if (status === 1 && key.style.background !== 'var(--green)') key.style.background = 'var(--yellow)';
-                                if (status === 0 && key.style.background !== 'var(--green)') key.style.background = 'grey';
+                                if (statusArray[index] === 2) key.style.background = 'var(--green)';
+                                if (statusArray[index] === 1 && key.style.background !== 'var(--green)') key.style.background = 'var(--yellow)';
+                                if (statusArray[index] === 0 && key.style.background !== 'var(--green)' && key.style.background !== 'var(--yellow)') key.style.background = 'grey';
                             }
                         })
                         clipboardCodes.push(status);
@@ -186,6 +227,7 @@ const game = async () => {
                         modal.open(`<div class='modal-card'><h2>Bad job</h2><h2>word was '${word}' idiot</h2><p onclick=copyText()'>SHARE</p></div>`);
                     }
                     currentGuess = [];
+                    statusArray = [0,0,0,0,0]
                 }, 1200)
             }
         }
@@ -235,6 +277,7 @@ const game = async () => {
                     localStorage.setItem('guesses', pastGuesses)
                     let numberCorrect = 0;
                     const currentCheck = {};
+                    let statusArray = [0,0,0,0,0]
 
                     for (let i = 0; i < word.length; i++) {
                         if (currentCheck[word[i]]) {
@@ -243,38 +286,57 @@ const game = async () => {
                             currentCheck[word[i]] = [i];
                         }
                     }
+                    for (let i = 0; i < guess.length; i++) {
+                        const currentLetter = guess[i].toLowerCase();
+                        if (currentCheck[currentLetter]) {
+                            if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(i)) { 
+                                statusArray[i] = 2; 
+                                const removeIndex = currentCheck[currentLetter].indexOf(i);
+                                currentCheck[currentLetter].splice(removeIndex, 1)
+                            } else { statusArray[i] = 0; }
+                        } else { statusArray[i] = 0; }
+                    }
+                    for (let i = 0; i < guess.length; i++) {
+                        const currentLetter = guess[i].toLowerCase();
+                        if (currentCheck[currentLetter]) {
+                            if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
+                                statusArray[i] = 1; 
+                                currentCheck[currentLetter].push('yellowed')
+                            } 
+                        } 
+                    }
                     Array.from(guessGrid[currentLine].children).forEach((letter, index) => {
                         setTimeout(() => {
-                            let status;
-                            const currentLetter = guess[index].toLowerCase();
-                            if (currentCheck[currentLetter]) {
-                                if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(index)) { 
-                                    status = 2; 
-                                    const removeIndex = currentCheck[currentLetter].indexOf(index);
-                                    currentCheck[currentLetter].splice(removeIndex, 1)
-                                }
-                                else if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
-                                    status = 1; 
-                                    currentCheck[currentLetter].push('yellowed')
-                                }
-                                else { status = 0 }
-                            } else { status = 0}
-                                letter.innerHTML = currentGuess[index];
-                                letter.classList.add('letter--filled');
-                            if (status === 2) {
+                            // let status;
+                            // const currentLetter = guess[index].toLowerCase();
+                            // if (currentCheck[currentLetter]) {
+                            //     if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(index)) { 
+                            //         status = 2; 
+                            //         const removeIndex = currentCheck[currentLetter].indexOf(index);
+                            //         currentCheck[currentLetter].splice(removeIndex, 1)
+                            //     }
+                            //     else if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
+                            //         status = 1; 
+                            //         currentCheck[currentLetter].push('yellowed')
+                            //     }
+                            //     else { status = 0 }
+                            // } else { status = 0}
+                            letter.innerHTML = currentGuess[index];
+                            letter.classList.add('letter--filled');
+                            if (statusArray[index] === 2) {
                                 letter.style.background = 'var(--green)';
                                 numberCorrect++;
                             };
-                            if (status === 1) letter.style.background = 'var(--yellow)';
-                            if (status === 0) letter.style.background = 'grey';
+                            if (statusArray[index] === 1) letter.style.background = 'var(--yellow)';
+                            if (statusArray[index] === 0) letter.style.background = 'grey';
                             keys.forEach(key => {
                                 if (key.innerHTML === currentGuess[index].toLowerCase()) {
-                                    if (status === 2) key.style.background = 'var(--green)';
-                                    if (status === 1 && key.style.background !== 'var(--green)') key.style.background = 'var(--yellow)';
-                                    if (status === 0 && key.style.background !== 'var(--green)') key.style.background = 'grey';
+                                    if (statusArray[index] === 2) key.style.background = 'var(--green)';
+                                    if (statusArray[index] === 1 && key.style.background !== 'var(--green)') key.style.background = 'var(--yellow)';
+                                    if (statusArray[index] === 0 && key.style.background !== 'var(--green)' && key.style.background !== 'var(--yellow)') key.style.background = 'grey';
                                 }
                             })
-                            clipboardCodes.push(status);
+                            clipboardCodes.push(statusArray[index]);
                             localStorage.setItem('clipboardCode', clipboardCodes.join(' '))
                             if (numberCorrect === 5) {
                                 modal.open("<div class='modal-card'><h2>Nice job</h2><p>SHARE</p></div>");
@@ -290,6 +352,7 @@ const game = async () => {
                             modal.open(`<div class='modal-card'><h2>Bad job</h2><h2>word was '${word}' idiot</h2><p>SHARE</p></div>`);
                         }
                         currentGuess = [];
+                        statusArray = [0,0,0,0,0]
                     }, 1200)
                 }
             }
