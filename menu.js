@@ -1,6 +1,16 @@
 import { attemptLogin } from "./api.js";
 
-const checker = /^(?=.{1,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/
+// const checker = /^(?=.{1,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/
+const validchars = 'abcdefghijklmnopqrstuvwxzy1234567890'
+const checker = (input) => {
+    if (input.length === 0 || input.length > 20) {
+        return false;
+    }
+    for (let i = 0; i < input.length; i++) {
+        if (!validchars.includes(input[i])) return; false
+    }
+    return true;
+}
 const logout = document.querySelector(".logout");
 
 const burger = document.querySelector(".hamburger");
@@ -21,9 +31,11 @@ window.onload = () => {
     const user = sessionStorage.getItem('username')
     if (user) {
         login.style.display = 'none';
+        logout.style.display = 'block';
         account.style.display = 'block';
     } else {
         login.style.display = 'block';
+        logout.style.display = 'none';
         account.style.display = 'none';
     }
 }
@@ -34,10 +46,10 @@ logout.addEventListener("click", () => {
 })
 
 signupBtn.addEventListener("click", () => {
-    const username = usernameInput.value;
+    const username = usernameInput.value.toLowerCase();
     const password = passwordInput.value;
 
-    if (checker.test(username)) {
+    if (checker(username)) {
         attemptLogin({
             signup: true,
             username: username,
@@ -57,7 +69,7 @@ signupBtn.addEventListener("click", () => {
 loginBtn.addEventListener("click", () => {
     const username = usernameInput.value;
     const password = passwordInput.value;
-    if (checker.test(username)) {
+    if (checker(username)) {
         attemptLogin({
             signup: false,
             username: username,

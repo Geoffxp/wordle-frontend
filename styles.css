@@ -52,6 +52,7 @@ ul li {
     list-style: none;
 }
 .hamburger {
+    cursor: pointer;
     display: block;
     height: 28px;
     width: 40px;
