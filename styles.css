@@ -184,10 +184,12 @@ ul li {
 }
 .backspace {
     width: 50px;
+    font-size: 5px;
     color:transparent;
     position: relative;
 }
 .backspace::after {
+    font-size: 20px;
     content: '<';
     width: 100%;
     height: 100%;
@@ -344,9 +346,12 @@ ul li {
     background: transparent;
     border: 1px solid white;
 }
-
+.letter-grid.opponent {
+    margin: 12px auto;
+}
 .opponentName {
     text-align: center;
+    margin: 6px auto;
 }
 .logout {
     cursor: pointer;
