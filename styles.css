@@ -92,6 +92,17 @@ ul li {
     perspective: 500px;
     -webkit-perspective: 500px;
 }
+.small-grid {
+    margin: 0 auto;
+}
+.small-grid .letter-row {
+    width: 132px;
+    gap: 2px;
+}
+.small-grid .letter {
+    width: 25px;
+    height: 25px;
+}
 .letter {
     outline: 1px solid grey;
     width: 50px;
@@ -349,4 +360,8 @@ ul li {
 .bottom-nav a {
     display: block;
     margin: 0 24px;
+}
+.unknown-word .letter {
+    outline: 1px solid red;
+    background: transparent !important;
 }

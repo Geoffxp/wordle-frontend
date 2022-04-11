@@ -11,15 +11,17 @@ const game = async () => {
 
 
     // backend game creation / joining
-    const playerName = sessionStorage.getItem('username');
     const opponentNameDock = document.querySelector(".opponentName");
-    let gameData = await getGameData(playerName);
+    let gameData = await getGameData(sessionStorage.getItem('username'));
+    console.log(gameData)
     document.querySelector('.hours').innerText = 'searching...'
     const opponentGrid = document.querySelector(".opponent").children[0]
     const word = gameData.word;
     const playerIndex = gameData.players.length - 1;
+    const playerName = gameData.players[playerIndex].playerName;
     const opponentIndex = gameData.players.length > 1 ? 0 : 1;
     const token = gameData.token;
+    const prevGuesses = document.querySelector(".prev-guess-bay");
 
     // starting loop to check if match has been found and start the game
     const matchmaker = setInterval(async () => {
@@ -61,7 +63,7 @@ const game = async () => {
                     if (gameData.winner.playerName == playerName) {
                         alert('you won')
                     } else {
-                        alert(`your lost, the word was: ${word}`)
+                        alert(`you lost, the word was: ${word}`)
                     }
                     clearInterval(updater)
                 } else {
@@ -134,13 +136,65 @@ const game = async () => {
         }
     }, 1000)
 
+    const addGuess = (guess, guessBay) => {
+        if (guessBay.children.length < 4) {
+            guessBay.innerHTML += `
+            <div class="letter-grid small-grid">
+                <div class="letter-row">
+                    <div style="background: ${guess[0].color}" class="letter">
+                        ${guess[0].letter}
+                    </div>
+                    <div style="background: ${guess[1].color}" class="letter">
+                        ${guess[1].letter}
+                    </div>
+                    <div style="background: ${guess[2].color}" class="letter">
+                        ${guess[2].letter}
+                    </div>
+                    <div style="background: ${guess[3].color}" class="letter">
+                        ${guess[3].letter}
+                    </div>
+                    <div style="background: ${guess[4].color}" class="letter">
+                        ${guess[4].letter}
+                    </div>
+                </div>
+            </div>`
+        } else {
+            guessBay.removeChild(guessBay.children[0]);
+            guessBay.innerHTML += `
+            <div class="letter-grid small-grid">
+                <div class="letter-row">
+                    <div style="background: ${guess[0].color}" class="letter">
+                        ${guess[0].letter}
+                    </div>
+                    <div style="background: ${guess[1].color}" class="letter">
+                        ${guess[1].letter}
+                    </div>
+                    <div style="background: ${guess[2].color}" class="letter">
+                        ${guess[2].letter}
+                    </div>
+                    <div style="background: ${guess[3].color}" class="letter">
+                        ${guess[3].letter}
+                    </div>
+                    <div style="background: ${guess[4].color}" class="letter">
+                        ${guess[4].letter}
+                    </div>
+                </div>
+            </div>`
+        }
+    }
     const handleKeypress = (e, mobile) => {
+        guessGrid.classList.remove("unknown-word");
         if (gameData.isRunning) {
             const char = mobile ? e.innerHTML : e.key;
             if (char === 'Enter' && currentGuess.length === 5) {
                 const guess = currentGuess.join('');
-                if (!words.includes(guess)) {
-                    alert('not a word')
+                if (!words.includes(guess) && guess !== word) {
+                    currentGuess = [];
+                    guessGrid.classList.add("unknown-word");
+                    Array.from(guessGrid.children).forEach((letter, index) => {
+                        letter.classList.add('letter--filled--battle')
+                        letter.innerHTML = '&nbsp;';
+                    })
                 } else {
             //         pastGuesses += currentGuess.join('');
             //         pastGuesses += ' ';
@@ -176,6 +230,14 @@ const game = async () => {
                             } 
                         } 
                     }
+                    let prevGuessDetails = {
+                        1: null,
+                        2: null,
+                        3: null,
+                        4: null,
+                        5: null,
+                    };
+
                     Array.from(guessGrid.children).forEach((letter, index) => {
                         // let status;
                         // if (currentCheck[currentLetter]) {
@@ -193,11 +255,27 @@ const game = async () => {
                         letter.innerHTML = currentGuess[index];
                         letter.classList.add('letter--filled--battle');
                         if (statusArray[index] === 2) {
+                            prevGuessDetails[index] = {
+                                letter: letter.innerText,
+                                color: 'var(--green)'
+                            }
                             letter.style.background = 'var(--green)';
                             numberCorrect++;
                         };
-                        if (statusArray[index] === 1) letter.style.background = 'var(--yellow)';
-                        if (statusArray[index] === 0) letter.style.background = 'grey';
+                        if (statusArray[index] === 1) {
+                            prevGuessDetails[index] = {
+                                letter: letter.innerText,
+                                color: 'var(--yellow)'
+                            }
+                            letter.style.background = 'var(--yellow)'
+                        };
+                        if (statusArray[index] === 0) {
+                            prevGuessDetails[index] = {
+                                letter: letter.innerText,
+                                color: 'grey'
+                            }
+                            letter.style.background = 'grey'
+                        };
                         keys.forEach(key => {
                             if (key.innerHTML === currentGuess[index].toLowerCase()) {
                                 if (statusArray[index] === 2) key.style.background = 'var(--green)';
@@ -209,6 +287,7 @@ const game = async () => {
                     if (numberCorrect === 5) {
                         console.log('correct')
                     } else {
+                        addGuess(prevGuessDetails, prevGuesses);
                         currentGuess = [];
                         statusArray = [0,0,0,0,0];
                     }

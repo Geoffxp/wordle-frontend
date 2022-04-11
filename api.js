@@ -1,5 +1,5 @@
-// const URL = "http://localhost:5000"
-const URL = "https://six-hour-words.herokuapp.com"
+const URL = "http://localhost:5000"
+// const URL = "https://six-hour-words.herokuapp.com"
 
 export async function getGordle() {
     const gordle = await fetch(`${URL}/`).then(res => res.json()).then(res => res.data);
