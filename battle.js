@@ -13,7 +13,6 @@ const game = async () => {
     // backend game creation / joining
     const opponentNameDock = document.querySelector(".opponentName");
     let gameData = await getGameData(sessionStorage.getItem('username'));
-    console.log(gameData)
     document.querySelector('.hours').innerText = 'searching...'
     const opponentGrid = document.querySelector(".opponent").children[0]
     const word = gameData.word;
