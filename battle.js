@@ -43,6 +43,31 @@ const game = async () => {
             }
         })
     }, 1000)
+    const check = (word, guess) => {
+        const wordArray = word.split('');
+        const guessArray = guess.split('');
+    
+        const yellowed = [];
+        const statusArray = [0,0,0,0,0];
+    
+        for (let i = 0; i < wordArray.length; i++) {
+            if (wordArray[i] === guessArray[i]) {
+                statusArray[i] = 2;
+                wordArray.splice(i, 1, 0);
+            }
+        }
+        for (let i = 0; i < wordArray.length; i++) {
+            if (statusArray[i] !== 2) {
+                if (wordArray.includes(guessArray[i]) && !yellowed.includes(guessArray[i])) {
+                    statusArray[i] = 1;
+                    yellowed.push(guessArray[i]);
+                } else {
+                    statusArray[i] = 0;
+                }
+            }
+        }
+        return statusArray;
+    }
     const updater = setInterval(() => {
         if (gameData.isRunning) {
             if (!clockRunning) {
@@ -74,38 +99,39 @@ const game = async () => {
                     }
                 }
 
-                const currentCheck = {};
+                // const currentCheck = {};
                 let statusArray = [0,0,0,0,0];
                 const guess = gameData.players[opponentIndex].lastGuess;
 
-                for (let i = 0; i < word.length; i++) {
-                    if (currentCheck[word[i]]) {
-                        currentCheck[word[i]].push(i);
-                    } else {
-                        currentCheck[word[i]] = [i];
-                    }
-                }
-                for (let i = 0; i < guess.length; i++) {
-                    const currentLetter = guess[i].toLowerCase();
-                    if (currentCheck[currentLetter]) {
-                        if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(i)) { 
-                            statusArray[i] = 2; 
-                            const removeIndex = currentCheck[currentLetter].indexOf(i);
-                            currentCheck[currentLetter].splice(removeIndex, 1)
-                        } else { statusArray[i] = 0; }
-                    } else { statusArray[i] = 0; }
-                }
-                for (let i = 0; i < guess.length; i++) {
-                    const currentLetter = guess[i].toLowerCase();
-                    if (currentCheck[currentLetter]) {
-                        if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
-                            statusArray[i] = 1; 
-                            currentCheck[currentLetter].push('yellowed')
-                        } 
-                    } 
-                }
+                // for (let i = 0; i < word.length; i++) {
+                //     if (currentCheck[word[i]]) {
+                //         currentCheck[word[i]].push(i);
+                //     } else {
+                //         currentCheck[word[i]] = [i];
+                //     }
+                // }
+                // for (let i = 0; i < guess.length; i++) {
+                //     const currentLetter = guess[i].toLowerCase();
+                //     if (currentCheck[currentLetter]) {
+                //         if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(i)) { 
+                //             statusArray[i] = 2; 
+                //             const removeIndex = currentCheck[currentLetter].indexOf(i);
+                //             currentCheck[currentLetter].splice(removeIndex, 1)
+                //         } else { statusArray[i] = 0; }
+                //     } else { statusArray[i] = 0; }
+                // }
+                // for (let i = 0; i < guess.length; i++) {
+                //     const currentLetter = guess[i].toLowerCase();
+                //     if (currentCheck[currentLetter]) {
+                //         if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
+                //             statusArray[i] = 1; 
+                //             currentCheck[currentLetter].push('yellowed')
+                //         } 
+                //     } 
+                // }
     
                 if (guess) {
+                    statusArray = check(word, guess);
                     Array.from(opponentGrid.children).forEach((letter, index) => {
                         // let status;
                         // const currentLetter = guess[index].toLowerCase();
@@ -199,36 +225,37 @@ const game = async () => {
             //         pastGuesses += ' ';
             //         localStorage.setItem('guesses', pastGuesses)
                     gameData.players[playerIndex].lastGuess = guess;
+                    updateGame(gameData, playerIndex)
                     let numberCorrect = 0;
-                    const currentCheck = {};
-                    let statusArray = [0,0,0,0,0];
+                    // const currentCheck = {};
+                    let statusArray = check(word, guess)
     
-                    for (let i = 0; i < word.length; i++) {
-                        if (currentCheck[word[i]]) {
-                            currentCheck[word[i]].push(i);
-                        } else {
-                            currentCheck[word[i]] = [i];
-                        }
-                    }
-                    for (let i = 0; i < guess.length; i++) {
-                        const currentLetter = guess[i].toLowerCase();
-                        if (currentCheck[currentLetter]) {
-                            if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(i)) { 
-                                statusArray[i] = 2; 
-                                const removeIndex = currentCheck[currentLetter].indexOf(i);
-                                currentCheck[currentLetter].splice(removeIndex, 1)
-                            } else { statusArray[i] = 0; }
-                        } else { statusArray[i] = 0; }
-                    }
-                    for (let i = 0; i < guess.length; i++) {
-                        const currentLetter = guess[i].toLowerCase();
-                        if (currentCheck[currentLetter]) {
-                            if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
-                                statusArray[i] = 1; 
-                                currentCheck[currentLetter].push('yellowed')
-                            } 
-                        } 
-                    }
+                    // for (let i = 0; i < word.length; i++) {
+                    //     if (currentCheck[word[i]]) {
+                    //         currentCheck[word[i]].push(i);
+                    //     } else {
+                    //         currentCheck[word[i]] = [i];
+                    //     }
+                    // }
+                    // for (let i = 0; i < guess.length; i++) {
+                    //     const currentLetter = guess[i].toLowerCase();
+                    //     if (currentCheck[currentLetter]) {
+                    //         if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(i)) { 
+                    //             statusArray[i] = 2; 
+                    //             const removeIndex = currentCheck[currentLetter].indexOf(i);
+                    //             currentCheck[currentLetter].splice(removeIndex, 1)
+                    //         } else { statusArray[i] = 0; }
+                    //     } else { statusArray[i] = 0; }
+                    // }
+                    // for (let i = 0; i < guess.length; i++) {
+                    //     const currentLetter = guess[i].toLowerCase();
+                    //     if (currentCheck[currentLetter]) {
+                    //         if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
+                    //             statusArray[i] = 1; 
+                    //             currentCheck[currentLetter].push('yellowed')
+                    //         } 
+                    //     } 
+                    // }
                     let prevGuessDetails = {
                         1: null,
                         2: null,
