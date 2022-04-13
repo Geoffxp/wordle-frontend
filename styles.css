@@ -223,9 +223,17 @@ ul li {
     z-index: 10;
     opacity: 1;
 }
-.modal h2 {
+.modal h2,
+.modal h3,
+.modal h4  {
     color: black;
     text-align: center;
+}
+.close {
+    margin-right: 24px;
+}
+.new-battle {
+    margin-left: 24px;
 }
 .modal p {
     color: black;

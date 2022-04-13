@@ -14,7 +14,11 @@ export default class Modal {
         this.mount.innerHTML = content;
         this.mount.classList.add('open');
         const share = document.querySelector('.modal-card p');
-        share.addEventListener('click', copyText);
+        const close = document.querySelector('.modal-card .close');
+        const newBattle = document.querySelector('.modal-card .new-battle');
+        if (newBattle) newBattle.addEventListener('click', () => window.location.reload());
+        if (close) close.addEventListener('click', () => this.close());
+        if (share) share.addEventListener('click', copyText);
     }
     close() {
         this.mount.innerHTML = '';

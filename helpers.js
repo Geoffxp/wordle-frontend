@@ -1,4 +1,4 @@
-const check = (word, guess) => {
+export function check(word, guess) {
     const wordArray = word.split('');
     const guessArray = guess.split('');
 
@@ -22,4 +22,14 @@ const check = (word, guess) => {
         }
     }
     return statusArray;
+}
+export function eloCalc(playerOne, playerTwo) {
+    const kFactor = 32;
+    const rating1 = Math.pow(10, (playerOne.elo / 400));
+    const rating2 = Math.pow(10, (playerTwo.elo / 400));
+    const prob = rating1 / (rating1 + rating2);
+    
+    const ratingChange = (playerOne.elo + kFactor * (playerOne.score - prob)) - playerOne.elo;
+    console.log(ratingChange)
+    return ratingChange;
 }

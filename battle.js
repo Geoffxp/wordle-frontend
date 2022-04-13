@@ -1,26 +1,27 @@
 import { checkReadyStatus, getGameData, getList, startGame, updateGame } from "./api.js";
+import { check, eloCalc } from "./helpers.js";
+import Modal from "./modal.js";
 
 const game = async () => {
+    const modal = new Modal('.modal');
+    let timer;
     let clockRunning = false;
-    // DEBUGGING CODE
-    // await fetch("http://localhost:5000/battle", { 
-    //     method: "DELETE",
-    //     headers: {"Content-Type": "application/json"},
-    //     body: null
-    // }).then(console.log)
-
 
     // backend game creation / joining
     const opponentNameDock = document.querySelector(".opponentName");
     let gameData = await getGameData(sessionStorage.getItem('username'));
+    console.log(gameData)
     document.querySelector('.hours').innerText = 'searching...'
     const opponentGrid = document.querySelector(".opponent").children[0]
     const word = gameData.word;
     const playerIndex = gameData.players.length - 1;
     const playerName = gameData.players[playerIndex].playerName;
     const opponentIndex = gameData.players.length > 1 ? 0 : 1;
+    let opponentElo;
+    const playerElo = gameData.players[playerIndex].elo;
     const token = gameData.token;
     const prevGuesses = document.querySelector(".prev-guess-bay");
+    let potentialWin = false;
 
     // starting loop to check if match has been found and start the game
     const matchmaker = setInterval(async () => {
@@ -33,8 +34,10 @@ const game = async () => {
                 });
                 const enemy = gameData.players[opponentIndex].playerName == 1 ||
                             gameData.players[opponentIndex].playerName == 2 ? `Player ${gameData.players[opponentIndex].playerName}` :
-                            gameData.players[opponentIndex].playerName
-                opponentNameDock.innerText = enemy
+                            gameData.players[opponentIndex].playerName;
+                opponentElo = gameData.players[opponentIndex].elo == 400 ? playerElo : gameData.players[opponentIndex].elo;
+                opponentNameDock.innerText = `${enemy}: ${opponentElo}`
+                
                 clearInterval(matchmaker);
             }
             if (isReady == 'timeout') {
@@ -43,36 +46,11 @@ const game = async () => {
             }
         })
     }, 1000)
-    const check = (word, guess) => {
-        const wordArray = word.split('');
-        const guessArray = guess.split('');
-    
-        const yellowed = [];
-        const statusArray = [0,0,0,0,0];
-    
-        for (let i = 0; i < wordArray.length; i++) {
-            if (wordArray[i] === guessArray[i]) {
-                statusArray[i] = 2;
-                wordArray.splice(i, 1, 0);
-            }
-        }
-        for (let i = 0; i < wordArray.length; i++) {
-            if (statusArray[i] !== 2) {
-                if (wordArray.includes(guessArray[i]) && !yellowed.includes(guessArray[i])) {
-                    statusArray[i] = 1;
-                    yellowed.push(guessArray[i]);
-                } else {
-                    statusArray[i] = 0;
-                }
-            }
-        }
-        return statusArray;
-    }
     const updater = setInterval(() => {
         if (gameData.isRunning) {
             if (!clockRunning) {
                 let secondsTill = (gameData.killTime - Date.now()) / 1000;
-                const timer = setInterval(() => {
+                timer = setInterval(() => {
                     secondsTill--;
                     if (secondsTill < 1) clearInterval(timer)
                     const seconds = Math.floor(secondsTill % 60).toString().length > 1 ? Math.floor(secondsTill % 60) : '0' + Math.floor(secondsTill % 60).toString()
@@ -81,83 +59,31 @@ const game = async () => {
                 }, 1000)
                 clockRunning = true;
             }
-            updateGame(gameData, playerIndex).then(res => res.json()).then(res => {
-                gameData = res;
-                if (gameData.winner) {
-                    if (gameData.winner.playerName == playerName) {
-                        alert('you won')
-                    } else {
-                        alert(`you lost, the word was: ${word}`)
-                    }
-                    clearInterval(updater)
-                } else {
-                    if (!res.isRunning) {
-                        alert(`draw, the word was: ${word}`)
-                        clearInterval(updater)
-                    } else {
-                        gameData = res;
-                    }
-                }
+            if (!potentialWin) {
+                updateGame(gameData, playerIndex).then(res => res.json()).then(res => {
+                    gameData = res;
+                    handleState();
 
-                // const currentCheck = {};
-                let statusArray = [0,0,0,0,0];
-                const guess = gameData.players[opponentIndex].lastGuess;
-
-                // for (let i = 0; i < word.length; i++) {
-                //     if (currentCheck[word[i]]) {
-                //         currentCheck[word[i]].push(i);
-                //     } else {
-                //         currentCheck[word[i]] = [i];
-                //     }
-                // }
-                // for (let i = 0; i < guess.length; i++) {
-                //     const currentLetter = guess[i].toLowerCase();
-                //     if (currentCheck[currentLetter]) {
-                //         if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(i)) { 
-                //             statusArray[i] = 2; 
-                //             const removeIndex = currentCheck[currentLetter].indexOf(i);
-                //             currentCheck[currentLetter].splice(removeIndex, 1)
-                //         } else { statusArray[i] = 0; }
-                //     } else { statusArray[i] = 0; }
-                // }
-                // for (let i = 0; i < guess.length; i++) {
-                //     const currentLetter = guess[i].toLowerCase();
-                //     if (currentCheck[currentLetter]) {
-                //         if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
-                //             statusArray[i] = 1; 
-                //             currentCheck[currentLetter].push('yellowed')
-                //         } 
-                //     } 
-                // }
-    
-                if (guess) {
-                    statusArray = check(word, guess);
-                    Array.from(opponentGrid.children).forEach((letter, index) => {
-                        // let status;
-                        // const currentLetter = guess[index].toLowerCase();
-                        // if (currentCheck[currentLetter]) {
-                        //     if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(index)) { 
-                        //         status = 2; 
-                        //         const removeIndex = currentCheck[currentLetter].indexOf(index);
-                        //         currentCheck[currentLetter].splice(removeIndex, 1)
-                        //     }
-                        //     else if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
-                        //         status = 1; 
-                        //         currentCheck[currentLetter].push('yellowed')
-                        //     }
-                        //     else { status = 0 }
-                        // } else { status = 0}
-                        letter.classList.add('letter--filled--battle');
-                        setTimeout(() => {letter.classList.remove('letter--filled--battle')}, 1000);
-                        if (statusArray[index] === 2) {
-                            letter.style.background = 'var(--green)';
-                        };
-                        if (statusArray[index] === 1) letter.style.background = 'var(--yellow)';
-                        if (statusArray[index] === 0) letter.style.background = 'grey';
-                    })
-                }
-                statusArray = [0,0,0,0,0];
-            });
+                    let statusArray = [0,0,0,0,0];
+                    const guess = gameData.players[opponentIndex].lastGuess;
+        
+                    if (guess) {
+                        statusArray = check(word, guess);
+                        Array.from(opponentGrid.children).forEach((letter, index) => {
+                            letter.classList.add('letter--filled--battle');
+                            setTimeout(() => {letter.classList.remove('letter--filled--battle')}, 1000);
+                            if (statusArray[index] === 2) {
+                                letter.style.background = 'var(--green)';
+                            };
+                            if (statusArray[index] === 1) letter.style.background = 'var(--yellow)';
+                            if (statusArray[index] === 0) letter.style.background = 'grey';
+                        })
+                    }
+                    statusArray = [0,0,0,0,0];
+                });
+            }
+        } else if (gameData.killTime) {
+            handleState()
         }
     }, 1000)
 
@@ -221,41 +147,10 @@ const game = async () => {
                         letter.innerHTML = '&nbsp;';
                     })
                 } else {
-            //         pastGuesses += currentGuess.join('');
-            //         pastGuesses += ' ';
-            //         localStorage.setItem('guesses', pastGuesses)
                     gameData.players[playerIndex].lastGuess = guess;
-                    updateGame(gameData, playerIndex)
                     let numberCorrect = 0;
-                    // const currentCheck = {};
                     let statusArray = check(word, guess)
-    
-                    // for (let i = 0; i < word.length; i++) {
-                    //     if (currentCheck[word[i]]) {
-                    //         currentCheck[word[i]].push(i);
-                    //     } else {
-                    //         currentCheck[word[i]] = [i];
-                    //     }
-                    // }
-                    // for (let i = 0; i < guess.length; i++) {
-                    //     const currentLetter = guess[i].toLowerCase();
-                    //     if (currentCheck[currentLetter]) {
-                    //         if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(i)) { 
-                    //             statusArray[i] = 2; 
-                    //             const removeIndex = currentCheck[currentLetter].indexOf(i);
-                    //             currentCheck[currentLetter].splice(removeIndex, 1)
-                    //         } else { statusArray[i] = 0; }
-                    //     } else { statusArray[i] = 0; }
-                    // }
-                    // for (let i = 0; i < guess.length; i++) {
-                    //     const currentLetter = guess[i].toLowerCase();
-                    //     if (currentCheck[currentLetter]) {
-                    //         if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
-                    //             statusArray[i] = 1; 
-                    //             currentCheck[currentLetter].push('yellowed')
-                    //         } 
-                    //     } 
-                    // }
+
                     let prevGuessDetails = {
                         1: null,
                         2: null,
@@ -265,19 +160,6 @@ const game = async () => {
                     };
 
                     Array.from(guessGrid.children).forEach((letter, index) => {
-                        // let status;
-                        // if (currentCheck[currentLetter]) {
-                        //     if (currentCheck[currentLetter].length && currentCheck[currentLetter].includes(index)) { 
-                        //         status = 2; 
-                        //         const removeIndex = currentCheck[currentLetter].indexOf(index);
-                        //         currentCheck[currentLetter].splice(removeIndex, 1)
-                        //     }
-                        //     else if (currentCheck[currentLetter].length && !currentCheck[currentLetter].includes('yellowed')) { 
-                        //         status = 1; 
-                        //         currentCheck[currentLetter].push('yellowed')
-                        //     }
-                        //     else { status = 0 }
-                        // } else { status = 0}
                         letter.innerHTML = currentGuess[index];
                         letter.classList.add('letter--filled--battle');
                         if (statusArray[index] === 2) {
@@ -311,7 +193,28 @@ const game = async () => {
                         })
                     })
                     if (numberCorrect === 5) {
-                        console.log('correct')
+                        updateGame(gameData, playerIndex).then(res => res.json()).then(res => {
+                            potentialWin = true;
+                            gameData = res;
+                            handleState();
+        
+                            let statusArray = [0,0,0,0,0];
+                            const guess = gameData.players[opponentIndex].lastGuess;
+                
+                            if (guess) {
+                                statusArray = check(word, guess);
+                                Array.from(opponentGrid.children).forEach((letter, index) => {
+                                    letter.classList.add('letter--filled--battle');
+                                    setTimeout(() => {letter.classList.remove('letter--filled--battle')}, 1000);
+                                    if (statusArray[index] === 2) {
+                                        letter.style.background = 'var(--green)';
+                                    };
+                                    if (statusArray[index] === 1) letter.style.background = 'var(--yellow)';
+                                    if (statusArray[index] === 0) letter.style.background = 'grey';
+                                })
+                            }
+                            statusArray = [0,0,0,0,0];
+                        });
                     } else {
                         addGuess(prevGuessDetails, prevGuesses);
                         currentGuess = [];
@@ -333,6 +236,50 @@ const game = async () => {
                         letter.innerHTML = '&nbsp;';
                     }
                 })
+            }
+        }
+    }
+    const handleState = () => {
+        if (gameData.winner) {
+            if (gameData.winner.playerName == playerName) {
+                const eloChange = parseInt(eloCalc({elo: playerElo, score: 1}, {elo: opponentElo, score: 0}));
+                modal.open(`
+                <div class='modal-card'>
+                    <h2>you won</h2>
+                    <h3>Elo Change: ${eloChange}</h3>
+                    <div class='bottom-nav'>
+                        <h4 class='close'>CLOSE</h4>
+                        <h4 class='new-battle'>NEW BATTLE</h4>
+                    </div>
+                </div>`)
+            } else {
+                const eloChange = parseInt(eloCalc({elo: playerElo, score: 0}, {elo: opponentElo, score: 1}));
+                modal.open(`
+                <div class='modal-card'>
+                    <h2>you lost, the word was: ${word}</h2>
+                    <h3>Elo Change: ${eloChange}</h3>
+                    <div class='bottom-nav'>
+                        <h4 class='close'>CLOSE</h4>
+                        <h4 class='new-battle'>NEW BATTLE</h4>
+                    </div>
+                </div>`)
+            }
+            clearInterval(timer)
+            clearInterval(updater)
+        } else {
+            if (!gameData.isRunning) {
+                const eloChange = parseInt(eloCalc({elo: playerElo, score: 0.5}, {elo: opponentElo, score: 0.5}));
+                modal.open(`
+                <div class='modal-card'>
+                    <h2>draw, the word was: ${word}</h2>
+                    <h3>Elo Change: ${eloChange}</h3>
+                    <div class='bottom-nav'>
+                        <h4 class='close'>CLOSE</h4>
+                        <h4 class='new-battle'>NEW BATTLE</h4>
+                    </div>
+                </div>`)
+                clearInterval(timer)
+                clearInterval(updater)
             }
         }
     }
