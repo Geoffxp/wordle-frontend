@@ -376,6 +376,7 @@ const game = async () => {
                 <div class='modal-card'>
                     <h2>you won</h2>
                     <h3>Elo Change: ${eloChange}</h3>
+                    <h3>New Elo: ${playerElo + eloChange}</h3>
                     <div class='bottom-nav'>
                         <h4 class='close'>CLOSE</h4>
                         <h4 class='new-battle'>NEW BATTLE</h4>
@@ -387,6 +388,7 @@ const game = async () => {
                 <div class='modal-card'>
                     <h2>you lost, the word was: ${word}</h2>
                     <h3>Elo Change: ${eloChange}</h3>
+                    <h3>New Elo: ${playerElo + eloChange}</h3>
                     <div class='bottom-nav'>
                         <h4 class='close'>CLOSE</h4>
                         <h4 class='new-battle'>NEW BATTLE</h4>
@@ -402,6 +404,7 @@ const game = async () => {
                 <div class='modal-card'>
                     <h2>draw, the word was: ${word}</h2>
                     <h3>Elo Change: ${eloChange}</h3>
+                    <h3>New Elo: ${playerElo + eloChange}</h3>
                     <div class='bottom-nav'>
                         <h4 class='close'>CLOSE</h4>
                         <h4 class='new-battle'>NEW BATTLE</h4>
