@@ -225,14 +225,22 @@ ul li {
 }
 .modal h2,
 .modal h3,
-.modal h4  {
+.modal h4,
+.modal *  {
     color: black;
     text-align: center;
+    font-size: 24px;
+    margin-bottom: 36px;
+    display: block;
+}
+.battle h3 {
+    cursor: pointer;
+    text-decoration: underline;
 }
 .close {
     margin-right: 24px;
 }
-.new-battle {
+.new-battle:not(.soldier) {
     margin-left: 24px;
 }
 .modal p {

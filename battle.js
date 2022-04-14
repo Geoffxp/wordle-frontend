@@ -1,16 +1,135 @@
 import { checkReadyStatus, getGameData, getList, startGame, updateGame } from "./api.js";
 import { check, eloCalc } from "./helpers.js";
 import Modal from "./modal.js";
+const modal = new Modal('.modal');
+const initialState = `
+    <h2 class="opponentName">&nbsp;</h2>
+    <div class="letter-grid opponent">
+        <div class="letter-row">
+            <div class="letter">
+                &nbsp;
+            </div>
+            <div class="letter">
+                &nbsp;
+            </div>
+            <div class="letter">
+                &nbsp;
+            </div>
+            <div class="letter">
+                &nbsp;
+            </div>
+            <div class="letter">
+                &nbsp;
+            </div>
+        </div>
+    </div>
+    <div class="splitter">&nbsp;</div>
 
+    <div class="prev-guess-bay">
+        <div class="letter-grid small-grid">
+            <div class="letter-row">
+                <div class="letter"></div>
+                <div class="letter"></div>
+                <div class="letter"></div>
+                <div class="letter"></div>
+                <div class="letter"></div>
+            </div>
+        </div>
+        <div class="letter-grid small-grid">
+            <div class="letter-row">
+                <div class="letter"></div>
+                <div class="letter"></div>
+                <div class="letter"></div>
+                <div class="letter"></div>
+                <div class="letter"></div>
+            </div>
+        </div>
+        <div class="letter-grid small-grid">
+            <div class="letter-row">
+                <div class="letter"></div>
+                <div class="letter"></div>
+                <div class="letter"></div>
+                <div class="letter"></div>
+                <div class="letter"></div>
+            </div>
+        </div>
+        <div class="letter-grid small-grid">
+            <div class="letter-row">
+                <div class="letter"></div>
+                <div class="letter"></div>
+                <div class="letter"></div>
+                <div class="letter"></div>
+                <div class="letter"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="letter-grid player">
+        <div class="letter-row">
+            <div class="letter">
+                &nbsp;
+            </div>
+            <div class="letter">
+                &nbsp;
+            </div>
+            <div class="letter">
+                &nbsp;
+            </div>
+            <div class="letter">
+                &nbsp;
+            </div>
+            <div class="letter">
+                &nbsp;
+            </div>
+        </div>
+    </div>
+    <div class="keyboard">
+        <div class="keyboard-row">
+            <div class="key">q</div>
+            <div class="key">w</div>
+            <div class="key">e</div>
+            <div class="key">r</div>
+            <div class="key">t</div>
+            <div class="key">y</div>
+            <div class="key">u</div>
+            <div class="key">i</div>
+            <div class="key">o</div>
+            <div class="key">p</div>
+        </div>
+        <div class="keyboard-row">
+            <div class="key">a</div>
+            <div class="key">s</div>
+            <div class="key">d</div>
+            <div class="key">f</div>
+            <div class="key">g</div>
+            <div class="key">h</div>
+            <div class="key">j</div>
+            <div class="key">k</div>
+            <div class="key">l</div>
+        </div>
+        <div class="keyboard-row">
+            <div class="key enter">Enter</div>
+            <div class="key">z</div>
+            <div class="key">x</div>
+            <div class="key">c</div>
+            <div class="key">v</div>
+            <div class="key">b</div>
+            <div class="key">n</div>
+            <div class="key">m</div>
+            <div class="key backspace">Backspace</div>
+        </div>
+    </div>
+`
 const game = async () => {
-    const modal = new Modal('.modal');
+    document.querySelector('game-state').innerHTML = initialState;
+    const typeSound = new Audio('./typing.wav');
+    typeSound.volume = 0.3;
     let timer;
     let clockRunning = false;
 
     // backend game creation / joining
     const opponentNameDock = document.querySelector(".opponentName");
     let gameData = await getGameData(sessionStorage.getItem('username'));
-    console.log(gameData)
     document.querySelector('.hours').innerText = 'searching...'
     const opponentGrid = document.querySelector(".opponent").children[0]
     const word = gameData.word;
@@ -32,6 +151,9 @@ const game = async () => {
                     token: token,
                     isRunning: true
                 });
+                const startSound = new Audio('./start.wav')
+                startSound.volume = 0.5;
+                startSound.play();
                 const enemy = gameData.players[opponentIndex].playerName == 1 ||
                             gameData.players[opponentIndex].playerName == 2 ? `Player ${gameData.players[opponentIndex].playerName}` :
                             gameData.players[opponentIndex].playerName;
@@ -50,8 +172,13 @@ const game = async () => {
         if (gameData.isRunning) {
             if (!clockRunning) {
                 let secondsTill = (gameData.killTime - Date.now()) / 1000;
+                let soundPlayed = false;
                 timer = setInterval(() => {
                     secondsTill--;
+                    if (secondsTill < 30 && !soundPlayed) {
+                        soundPlayed = true;
+                        new Audio('./time_low.wav').play()
+                    }
                     if (secondsTill < 1) clearInterval(timer)
                     const seconds = Math.floor(secondsTill % 60).toString().length > 1 ? Math.floor(secondsTill % 60) : '0' + Math.floor(secondsTill % 60).toString()
                     const minutes = Math.floor((secondsTill / 60) % 60).toString().length > 1 ? Math.floor((secondsTill / 60) % 60) : '0' + Math.floor((secondsTill / 60) % 60).toString()
@@ -134,6 +261,8 @@ const game = async () => {
         }
     }
     const handleKeypress = (e, mobile) => {
+        typeSound.currentTime = 0;
+        typeSound.play();
         guessGrid.classList.remove("unknown-word");
         if (gameData.isRunning) {
             const char = mobile ? e.innerHTML : e.key;
@@ -251,7 +380,7 @@ const game = async () => {
                         <h4 class='close'>CLOSE</h4>
                         <h4 class='new-battle'>NEW BATTLE</h4>
                     </div>
-                </div>`)
+                </div>`, game)
             } else {
                 const eloChange = parseInt(eloCalc({elo: playerElo, score: 0}, {elo: opponentElo, score: 1}));
                 modal.open(`
@@ -262,7 +391,7 @@ const game = async () => {
                         <h4 class='close'>CLOSE</h4>
                         <h4 class='new-battle'>NEW BATTLE</h4>
                     </div>
-                </div>`)
+                </div>`, game)
             }
             clearInterval(timer)
             clearInterval(updater)
@@ -277,7 +406,7 @@ const game = async () => {
                         <h4 class='close'>CLOSE</h4>
                         <h4 class='new-battle'>NEW BATTLE</h4>
                     </div>
-                </div>`)
+                </div>`, game)
                 clearInterval(timer)
                 clearInterval(updater)
             }
@@ -306,4 +435,8 @@ const game = async () => {
     })
     document.addEventListener('keydown', (e) => handleKeypress(e, false))
 }
-game();
+modal.open(`<div class='modal-card'>
+<h2>TEN-HUT SOLDIER</h2>
+${sessionStorage.getItem('username') ? '<h3 class="new-battle soldier">NEW BATTLE</h3>' : '<a href="/">LOGIN</a><h3 class="new-battle soldier">PLAY AS GUEST</h3>'}
+<a href="/">GO HOME LIKE A BABY</a>
+</div>`, game)

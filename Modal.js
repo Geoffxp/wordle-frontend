@@ -10,13 +10,18 @@ export default class Modal {
         });
 
     }
-    open(content) {
+    open(content, game) {
         this.mount.innerHTML = content;
         this.mount.classList.add('open');
         const share = document.querySelector('.modal-card p');
         const close = document.querySelector('.modal-card .close');
-        const newBattle = document.querySelector('.modal-card .new-battle');
-        if (newBattle) newBattle.addEventListener('click', () => window.location.reload());
+        const newBattles = document.querySelectorAll('.modal-card .new-battle');
+        newBattles.forEach(newBattle => {
+            newBattle.addEventListener('click', () => {
+                game();
+                this.close();
+            })
+        })
         if (close) close.addEventListener('click', () => this.close());
         if (share) share.addEventListener('click', copyText);
     }
