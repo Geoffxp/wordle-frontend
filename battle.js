@@ -126,10 +126,24 @@ const game = async () => {
     typeSound.volume = 0.3;
     let timer;
     let clockRunning = false;
+    let gameData;
 
     // backend game creation / joining
     const opponentNameDock = document.querySelector(".opponentName");
-    let gameData = await getGameData(sessionStorage.getItem('username'));
+    const previousToken = sessionStorage.getItem('previousGameToken');
+    console.log('clicked')
+    if (previousToken) {
+        console.log('in prev')
+        const testData = await checkReadyStatus(previousToken, true);
+        if (testData) {
+            gameData = testData;
+        } else {
+            gameData = await getGameData(sessionStorage.getItem('username'));
+        }
+    } else {
+        gameData = await getGameData(sessionStorage.getItem('username'));
+    }
+    sessionStorage.setItem('previousGameToken', gameData.token);
     document.querySelector('.hours').innerText = 'searching...'
     const opponentGrid = document.querySelector(".opponent").children[0]
     const word = gameData.word;

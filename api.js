@@ -17,15 +17,19 @@ export async function getGameData(playerName) {
         return await fetch(`${URL}/battle`).then(res => res.json());
     }
 }
-export async function checkReadyStatus(token) {
-    return await fetch(`${URL}/battle?token=${token}`).then(res => res.json()).then(res => {
-        if (res.players.length > 1) {
-            return true;
-        } else if (res.timeout) {
-            return 'timeout'
-        }
-        return false;
-    })
+export async function checkReadyStatus(token, returning) {
+    if (returning) {
+        return await fetch(`${URL}/battle?token=${token}`).then(res => res.json()).catch(() => null)
+    } else {
+        return await fetch(`${URL}/battle?token=${token}`).then(res => res.json()).then(res => {
+            if (res.players.length > 1) {
+                return true;
+            } else if (res.timeout) {
+                return 'timeout'
+            }
+            return false;
+        })
+    }
 }
 export async function startGame(data) {
     return await fetch(`${URL}/battle?token=${data.token}`, {
