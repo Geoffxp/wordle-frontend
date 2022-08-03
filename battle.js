@@ -1,6 +1,10 @@
 import { checkReadyStatus, getGameData, getList, startGame, updateGame } from "./api.js";
 import { check, eloCalc } from "./helpers.js";
 import Modal from "./modal.js";
+const startSound = new Audio('./start.wav')
+const timeLow = new Audio('./time_low.wav')
+startSound.volume = 0.5;
+
 const modal = new Modal('.modal');
 const initialState = `
     <h2 class="opponentName">&nbsp;</h2>
@@ -118,12 +122,11 @@ const initialState = `
             <div class="key">m</div>
             <div class="key backspace">Backspace</div>
         </div>
+        <div class="player-data"></div>
     </div>
 `
 const game = async () => {
     document.querySelector('game-state').innerHTML = initialState;
-    const typeSound = new Audio('./typing.wav');
-    typeSound.volume = 0.3;
     let timer;
     let clockRunning = false;
     let gameData;
@@ -131,11 +134,9 @@ const game = async () => {
     // backend game creation / joining
     const opponentNameDock = document.querySelector(".opponentName");
     const previousToken = sessionStorage.getItem('previousGameToken');
-    console.log('clicked')
     if (previousToken) {
-        console.log('in prev')
         const testData = await checkReadyStatus(previousToken, true);
-        if (testData) {
+        if (testData && !testData.timeout) {
             gameData = testData;
         } else {
             gameData = await getGameData(sessionStorage.getItem('username'));
@@ -155,6 +156,7 @@ const game = async () => {
     const token = gameData.token;
     const prevGuesses = document.querySelector(".prev-guess-bay");
     let potentialWin = false;
+    document.querySelector('.player-data').innerText = `${playerName == 1 || playerName == 2 ? 'Player' + playerName : playerName} (${playerElo})`
 
     // starting loop to check if match has been found and start the game
     const matchmaker = setInterval(async () => {
@@ -165,20 +167,19 @@ const game = async () => {
                     token: token,
                     isRunning: true
                 });
-                const startSound = new Audio('./start.wav')
-                startSound.volume = 0.5;
                 startSound.play();
                 const enemy = gameData.players[opponentIndex].playerName == 1 ||
                             gameData.players[opponentIndex].playerName == 2 ? `Player ${gameData.players[opponentIndex].playerName}` :
                             gameData.players[opponentIndex].playerName;
-                opponentElo = gameData.players[opponentIndex].elo == 400 ? playerElo : gameData.players[opponentIndex].elo;
+                opponentElo = gameData.players[opponentIndex].elo
                 opponentNameDock.innerText = `${enemy}: ${opponentElo}`
                 
                 clearInterval(matchmaker);
             }
-            if (isReady == 'timeout') {
+            if (isReady == 'timeout' || isReady == null) {
                 alert('no one is playing please try again later');
                 clearInterval(matchmaker);
+                sessionStorage.setItem('previousGameToken', '')
             }
         })
     }, 1000)
@@ -191,7 +192,7 @@ const game = async () => {
                     secondsTill--;
                     if (secondsTill < 30 && !soundPlayed) {
                         soundPlayed = true;
-                        new Audio('./time_low.wav').play()
+                        timeLow.play()
                     }
                     if (secondsTill < 1) clearInterval(timer)
                     const seconds = Math.floor(secondsTill % 60).toString().length > 1 ? Math.floor(secondsTill % 60) : '0' + Math.floor(secondsTill % 60).toString()
@@ -275,8 +276,6 @@ const game = async () => {
         }
     }
     const handleKeypress = (e, mobile) => {
-        typeSound.currentTime = 0;
-        typeSound.play();
         guessGrid.classList.remove("unknown-word");
         if (gameData.isRunning) {
             const char = mobile ? e.innerHTML : e.key;
@@ -411,6 +410,7 @@ const game = async () => {
             }
             clearInterval(timer)
             clearInterval(updater)
+            sessionStorage.setItem('previousGameToken', '')
         } else {
             if (!gameData.isRunning) {
                 const eloChange = parseInt(eloCalc({elo: playerElo, score: 0.5}, {elo: opponentElo, score: 0.5}));
@@ -426,6 +426,7 @@ const game = async () => {
                 </div>`, game)
                 clearInterval(timer)
                 clearInterval(updater)
+                sessionStorage.setItem('previousGameToken', '')
             }
         }
     }

@@ -372,8 +372,12 @@ ul li {
 .logout {
     cursor: pointer;
 }
+.player-data {
+    margin-top: 12px;
+    text-align: center;
+}
 .bottom-nav {
-    margin-top: 48px;
+    margin-top: 24px;
     display: flex;
     width: 100%;
     justify-content: center;
@@ -385,4 +389,17 @@ ul li {
 .unknown-word .letter {
     outline: 1px solid red;
     background: transparent !important;
+}
+account {
+    max-width: 400px;
+    margin: 0 auto;
+    display: block;
+    text-align: center;
+}
+account ul {
+    list-style: none;
+    padding: 0;
+}
+account ul li {
+    margin: 4px 0;
 }

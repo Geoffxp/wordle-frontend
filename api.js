@@ -22,13 +22,13 @@ export async function checkReadyStatus(token, returning) {
         return await fetch(`${URL}/battle?token=${token}`).then(res => res.json()).catch(() => null)
     } else {
         return await fetch(`${URL}/battle?token=${token}`).then(res => res.json()).then(res => {
-            if (res.players.length > 1) {
+            if (res.players && res.players.length > 1) {
                 return true;
             } else if (res.timeout) {
                 return 'timeout'
             }
             return false;
-        })
+        }).catch(() => 'timeout')
     }
 }
 export async function startGame(data) {
@@ -68,6 +68,11 @@ export async function attemptLogin(data) {
             body: JSON.stringify(data)
         })
     }
+}
+
+export async function getUserDetails(username) {
+    console.log(`${URL}/user/find/${username}`)
+    return await fetch(`${URL}/user/find/${username}`).then(res => res.json())
 }
 
 
