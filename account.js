@@ -2,8 +2,7 @@ import { getUserDetails } from "./api.js"
 
 const username = sessionStorage.getItem('username')
 const { elo, wins, losses, ties, games } = await getUserDetails(username)
-const lastGame = JSON.parse(games[0])
-console.log(lastGame)
+const lastGame = games.length ? JSON.parse(games[games.length - 1]) : {}
 document.querySelector("account").innerHTML = `
     <h1>${username}</h1>
     <h2>ELO: ${elo}</h2>
